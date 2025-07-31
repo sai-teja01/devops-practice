@@ -1,0 +1,43 @@
+# .github/workflows/sonarqube-scan.yml
+
+name: SonarQube Scan
+
+# Controls when the action will run. 
+# Triggers the workflow on push events for the main branch.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarqube:
+    name: SonarQube Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository's code so the job can access it
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Disabling shallow clone is required for SonarQube to analyze pull requests correctly
+          fetch-depth: 0
+
+      # Step 2: Run the SonarQube Scan Action
+      # This action automatically downloads the SonarScanner, runs the analysis,
+      # and sends the report to your SonarQube Cloud project.
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          # The SONAR_TOKEN secret is used for authentication.
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          # The SONAR_HOST_URL is the URL of your SonarQube instance.
+          # For SonarQube Cloud, this is always https://sonarcloud.io
+          SONAR_HOST_URL: https://sonarcloud.io
+        with:
+          # You can specify project-specific properties here.
+          # The project key and organization name can be found in your SonarQube Cloud project settings.
+          args: >
+            -Dsonar.organization=your-org-key
+            -Dsonar.projectKey=your-project-keyazs
